@@ -18,8 +18,6 @@ curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-doc
 # uninstall 全局卸载
 ./get-docker.sh uninstall
 ```
-
-![getdocker](https://image.honeok.com/file/e15546f1ec2e29060b2e6.png)
-
+![getdocker](img/output.jpg)
 
 - 感谢B站伙伴（PS：忘了什么名字...）提供的AS4837镜像加速地址，hub.littlediary.cn 不胜感激.
