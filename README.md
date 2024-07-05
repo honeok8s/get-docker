@@ -1,14 +1,14 @@
 # get-docker
 
 ## 如何部署
-写着玩的，docker & docker-compose一键部署最新版，根据IP归属指定对应配置文件优化，使用自定义镜像加速对大陆鸡友好，主要自己方便~
+docker & docker-compose一键部署最新版，根据IP归属指定对应配置文件优化，针对大陆鸡使用自定义镜像加速.
 
 - 头也不回的安装
 ```shell
 bash <(wget -qO- https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh)
 ```
 
-- 长期使用,包括但不限于卸载又或是蛋疼
+- 本地使用，包含执行卸载
 ```shell
 curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh && chmod +x ./get-docker.sh
 
