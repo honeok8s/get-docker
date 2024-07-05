@@ -208,9 +208,9 @@ debian_install_docker(){
 
   check_docker_installed
   printf "${yellow}在${os_release}上安装Docker! ${white}\n"
+  apt install sudo >/dev/null 2>&1
 
   # 根据官方文档删除旧版本的Docker
-  apt install sudo >/dev/null 2>&1
   for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do
     sudo apt-get remove $pkg >/dev/null 2>&1 || true
   done
