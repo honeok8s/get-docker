@@ -214,7 +214,7 @@ debian_install_docker(){
     sudo apt-get remove $pkg >/dev/null 2>&1 || true
   done
 
-  sudo apt-get update >/dev/null 2>&1
+  sudo apt-get update >/dev/null 2>&1 || sudo apt update >/dev/null 2>&1
   sudo apt-get install -y ca-certificates curl
 
   sudo install -m 0755 -d /etc/apt/keyrings
