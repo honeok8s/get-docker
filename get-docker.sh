@@ -81,6 +81,7 @@ check_server_resources() {
   printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
   printf "${yellow}可用磁盘空间: ${disk_avail}${white}\n"
   printf "${yellow}内存使用率: ${mem_used_percentage}% ${white}\n"
+
   echo ""
 }
 
@@ -263,7 +264,6 @@ uninstall_docker() {
   else
     echo ""
     printf "${green}Docker和Docker Compose已从${os_release}卸载,并清理文件夹和相关依赖. ${white}\n"
-    echo ""
     sleep 2s
   fi
   
@@ -391,7 +391,6 @@ EOF
     # 校验和重新加载Docker守护进程
     printf "${green}Docker配置文件已重新加载并重启Docker服务. ${white}\n"
     sudo systemctl daemon-reload && sudo systemctl restart docker
-    echo ""
     printf "${yellow}Docker配置文件已根据服务器IP归属做相关优化,如需修改配置文件请 vim & nano $config_file ${white}\n"
 
     echo ""
