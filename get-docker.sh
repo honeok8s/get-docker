@@ -68,10 +68,14 @@ check_ip_address(){
 
 # 检查服务器内存和硬盘可用空间
 check_server_resources() {
+  # 获取内存总量
   mem_total=$(free -m | awk '/^Mem:/{print $2}')
+  # 获取根分区可用磁盘空间
   disk_avail=$(df -h / | awk 'NR==2 {print $4}')
-  mem_used_percentage=$(free | awk '/^Mem:/{printf("%.2f"), $3/$2*100}')
+  # 计算内存使用率并格式化为两位小数
+  mem_used_percentage=$(free | awk '/^Mem:/{printf("%.2f%%", $3/$2*100)}')
 
+  # 打印服务器内存和磁盘信息
   printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
   printf "${yellow}可用磁盘空间: ${disk_avail}${white}\n"
   printf "${yellow}内存使用率: ${mem_used_percentage}% ${white}\n"

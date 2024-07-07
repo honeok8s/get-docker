@@ -5,13 +5,13 @@ docker & docker-compose一键部署最新版，根据IP归属指定对应配置�
 
 - 使用方法
 ```shell
-curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/dev/get_docker.sh && chmod +x ./get_docker.sh
+curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/dev/get-docker.sh && chmod +x ./get-docker.sh
 
 # 默认安装 Docker
-./get_docker.sh
+./get-docker.sh
 
 # 卸载 Docker
-./get_docker.sh uninstall
+./get-docker.sh uninstall
 ```
 ![getdocker](img/output.png)
 
