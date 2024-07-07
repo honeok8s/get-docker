@@ -5,7 +5,7 @@ docker & docker-compose一键部署最新版，根据IP归属指定对应配置�
 
 - 使用方法
 ```shell
-curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/dev/get-docker.sh && chmod +x ./get-docker.sh
+curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh && chmod +x ./get-docker.sh
 
 # 默认安装 Docker
 ./get-docker.sh
@@ -15,4 +15,5 @@ curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/dev/get-dock
 ```
 ![getdocker](img/new_dev_1.0.8.png)
 
-- 感谢公益镜像加速源: https://note.youdao.com/s/10OwG83m ，B站: CN-JS-HuiBai，油管大佬: Kejilion 提供的加速源！
+- 感谢公益镜像加速源: https://note.youdao.com/s/10OwG83m
+- 感谢B站: CN-JS-HuiBai 油管大佬: Kejilion 提供的加速源！
