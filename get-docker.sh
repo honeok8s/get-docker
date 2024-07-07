@@ -138,7 +138,6 @@ centos_install_docker(){
     printf "${red}错误:Docker状态检查失败或服务无法启动,请检查安装日志或手动启动Docker服务. ${white}\n"
     exit 1
   else
-    echo ""
     printf "${green}Docker已完成自检,启动并设置开机自启. ${white}\n"
     sleep 2s
   fi
@@ -212,7 +211,6 @@ debian_install_docker(){
     printf "${red}错误:Docker状态检查失败或服务无法启动,请检查安装日志或手动启动Docker服务. ${white}\n"
     exit 1
   else
-    echo ""
     printf "${green}Docker已完成自检,启动并设置开机自启. ${white}\n"
     sleep 2s
   fi
