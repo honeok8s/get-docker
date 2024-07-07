@@ -18,7 +18,7 @@
 
 set -o errexit
 
-gitdocker_version=(Dev1.0.8)
+gitdocker_version=(Dev_1.0.8)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 uninstall_check_system=$(cat /etc/os-release)
 
