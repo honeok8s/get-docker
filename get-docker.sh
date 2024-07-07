@@ -414,6 +414,12 @@ docker_main_version(){
   printf "${yellow}已安装Docker Compose版本: $docker_compose_version ${white}\n"
   
   echo ""
+  
+  printf "${yellow}正在获取Docker信息. ${white}\n"
+  sleep 2s
+  sudo docker version
+  
+  echo ""
 }
 
 # 退出脚本前显示执行完成信息
@@ -485,12 +491,12 @@ main(){
     uninstall_docker
   else
     case "$os_release" in
-      *CentOS*)
+      *CentOS*|*centos*)
         centos_install_docker
         generate_docker_config
         docker_main_version
         ;;
-      *Ubuntu*|*Debian*)
+      *Debian*|*debian*|*Ubuntu*|*ubuntu*)
         debian_install_docker
         generate_docker_config
         docker_main_version
