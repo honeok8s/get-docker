@@ -85,22 +85,22 @@ check_server_resources() {
 
 # 检查Docker或Docker Compose是否已安装,用于在函数操作系统安装docker中嵌套
 check_docker_installed() {
-  if command -v docker &> /dev/null; then
-    printf "${red}Docker已安装,退出安装过程.${white}\n"
+  if docker --version >/dev/null 2>&1; then
+    printf "${red}Docker已安装,正在退出安装程序.${white}\n"
     echo ""
     script_completion_message
     exit 0
   fi
 
-  if command -v docker-compose &> /dev/null; then
-    printf "${red}Docker Compose(旧版本)已安装.退出安装过程.${white}\n"
+  if docker-compose --version >/dev/null 2>&1; then
+    printf "${red}Docker Compose(旧版)已安装,正在退出安装程序.${white}\n"
 	echo ""
 	script_completion_message
 	exit 0
   fi
 
-  if command -v docker compose &> /dev/null; then
-    printf "${red}Docker Compose(新版本)已安装.退出安装过程.${white}\n"
+  if docker compose --version >/dev/null 2>&1; then
+    printf "${red}Docker Compose(新版)已安装,正在退出安装程序.${white}\n"
 	echo ""
     script_completion_message
     exit 0
