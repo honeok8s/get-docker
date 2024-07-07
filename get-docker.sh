@@ -43,6 +43,7 @@ check_internet_connect(){
 	printf "${red}网络错误: 无法访问互联网!.${white}\n"
     exit 1
   fi
+  echo ""
 }
 
 # 获取服务器IP地址
@@ -105,6 +106,8 @@ check_docker_installed() {
     script_completion_message
     exit 0
   fi
+  
+  echo ""
 }
 
 # 在CentOS上安装Docker
@@ -139,6 +142,7 @@ centos_install_docker(){
     echo ""
     sleep 2s
   fi
+  echo ""
 }
 
 # 在 Debian/Ubuntu 上安装 Docker
@@ -210,6 +214,7 @@ debian_install_docker(){
     echo ""
     sleep 2s
   fi
+  echo ""
 }
 
 # 卸载Docker
@@ -255,6 +260,7 @@ uninstall_docker() {
     echo ""
     sleep 2s
   fi
+  echo ""
 }
 
 # 定义Docker配置文件
