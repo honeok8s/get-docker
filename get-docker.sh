@@ -284,7 +284,7 @@ generate_docker_config(){
     is_china_server='true'
   fi
 
-  # 基本配置
+  # 基本配置模板
   local base_config=$(cat <<EOF
 {
   "exec-opts": [
@@ -306,15 +306,15 @@ EOF
 # 根据条件生成不同的配置
   if [ "$is_china_server" == 'true' ]; then
     if [ -n "$ipv6_address" ]; then
-    # 中国服务器且存在IPv6
-    local china_with_ipv6_config=$(cat <<EOF
+      # 中国服务器且存在IPv6
+      local china_with_ipv6_config=$(cat <<EOF
 {
   "registry-mirrors": [
     "https://hub.littlediary.cn",
     "https://registry.honeok.com"
    ],
    "exec-opts": [
-      "native.cgroupdriver=systemd"
+     "native.cgroupdriver=systemd"
     ],
    "max-concurrent-downloads": 10,
    "max-concurrent-uploads": 5,
@@ -331,17 +331,17 @@ EOF
 }
 EOF
 )
-      echo "$china_with_ipv6_config" > "$config_file"
-    else
-      # 中国服务器但只有IPv4
-      local china_with_ipv4_config=$(cat <<EOF
+       echo "$china_with_ipv6_config" > "$config_file"
+     else
+       # 中国服务器但只有IPv4
+       local china_with_ipv4_config=$(cat <<EOF
 {
   "registry-mirrors": [
-     "https://hub.littlediary.cn",
-     "https://registry.honeok.com"
+    "https://hub.littlediary.cn",
+    "https://registry.honeok.com"
   ],
   "exec-opts": [
-     "native.cgroupdriver=systemd"
+    "native.cgroupdriver=systemd"
   ],
   "max-concurrent-downloads": 10,
   "max-concurrent-uploads": 5,
@@ -357,12 +357,12 @@ EOF
 )
       echo "$china_with_ipv4_config" > "$config_file"
     fi
-    elif [ -n "$ipv6_address" ]; then
+  elif [ -n "$ipv6_address" ]; then
     # 非中国服务器但存在IPv6
     local non_china_with_ipv6_config=$(cat <<EOF
 {
     "exec-opts": [
-       "native.cgroupdriver=systemd"
+      "native.cgroupdriver=systemd"
     ],
     "max-concurrent-downloads": 10,
     "max-concurrent-uploads": 5,
@@ -379,18 +379,19 @@ EOF
 }
 EOF
 )
-    echo "$non_china_with_ipv6_config" > "$config_file"
-  else
-    # 默认情况,非中国服务器且只有IPv4
-    echo "$base_config" > "$config_file"
-  fi
+      echo "$non_china_with_ipv6_config" > "$config_file"
+    else
+      # 默认情况,非中国服务器且只有IPv4
+      echo "$base_config" > "$config_file"
+    fi
 
-  # 校验和重新加载Docker守护进程
-  printf "${green}Docker配置文件已重新加载并重启Docker服务. ${white}\n"
-  sudo systemctl daemon-reload && sudo systemctl restart docker
-  echo ""
-  printf "${yellow}Docker配置文件已根据服务器IP归属做相关优化,如需修改配置文件请 vim & nano $config_file ${white}\n"
-  echo ""
+    # 校验和重新加载Docker守护进程
+    printf "${green}Docker配置文件已重新加载并重启Docker服务. ${white}\n"
+    sudo systemctl daemon-reload && sudo systemctl restart docker
+    echo ""
+    printf "${yellow}Docker配置文件已根据服务器IP归属做相关优化,如需修改配置文件请 vim & nano $config_file ${white}\n"
+
+    echo ""
 }
 
 # 显示已安装Docker和Docker Compose版本
