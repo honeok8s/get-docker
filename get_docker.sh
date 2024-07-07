@@ -18,7 +18,7 @@
 
 set -o errexit
 
-gitdocker_version=(Dev v1.0.8)
+gitdocker_version=(Dev1.0.8)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 uninstall_check_system=$(cat /etc/os-release)
 
@@ -74,7 +74,7 @@ check_server_resources() {
 
   printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
   printf "${yellow}可用磁盘空间: ${disk_avail}${white}\n"
-  printf "${yellow}内存使用率: ${mem_used_percentage}%${white}\n"
+  printf "${yellow}内存使用率: ${mem_used_percentage} ${white}\n"
 
   echo ""
 }
