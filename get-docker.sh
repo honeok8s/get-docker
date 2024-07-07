@@ -40,7 +40,7 @@ white='\033[0m'     # 用于结束颜色设置
 check_internet_connect(){
   printf "${yellow}执行网络检测.${white}\n"
   if ! ping -c 1 image.honeok.com &> /dev/null; then
-	printf "${red}网络错误: 无法访问互联网!.${white}\n"
+    printf "${red}网络错误: 无法访问互联网!.${white}\n"
     exit 1
   fi
   
@@ -96,14 +96,14 @@ check_docker_installed() {
 
   if docker-compose --version >/dev/null 2>&1; then
     printf "${red}Docker Compose(旧版)已安装,正在退出安装程序.${white}\n"
-	echo ""
-	script_completion_message
-	exit 0
+    echo ""
+    script_completion_message
+    exit 0
   fi
 
   if docker compose --version >/dev/null 2>&1; then
     printf "${red}Docker Compose(新版)已安装,正在退出安装程序.${white}\n"
-	echo ""
+    echo ""
     script_completion_message
     exit 0
   fi
@@ -228,20 +228,20 @@ uninstall_docker() {
   # 检查Docker是否安装
   if ! command -v docker &> /dev/null; then
     printf "${red}错误: Docker未安装在系统上,无法继续卸载.${white}\n"
-	exit 1
+    exit 1
   fi
   
   if [[ $uninstall_check_system == *"CentOS"* ]]; then
     printf "${yellow}从${os_release}卸载Docker. ${white}\n"
-	sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
+    sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
     sudo yum remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
-	sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -rf /etc/docker/*
+    sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -rf /etc/docker/*
   elif [[ $uninstall_check_system == *"Ubuntu"* ]] || [[ $uninstall_check_system == *"Debian"* ]]; then
     printf "${yellow}从${os_release}卸载Docker. ${white}\n"
-	sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
+    sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
     sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
     sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -fr /etc/docker/*
-	# 完全卸载debian/ubuntu的docker软件安装源
+    # 完全卸载debian/ubuntu的docker软件安装源
     if ls /etc/apt/sources.list.d/docker.* >/dev/null 2>&1; then
       sudo rm -f /etc/apt/sources.list.d/docker.*
     fi
@@ -250,16 +250,16 @@ uninstall_docker() {
     fi
   else
     printf "${red}抱歉,此脚本不支持您的Linux发行版. ${white}\n"
-	exit 1
+    exit 1
   fi
   
   # 检查卸载是否成功
   if command -v docker &> /dev/null; then
     printf "${red}错误: Docker卸载失败,请手动检查.${white}\n"
-	exit 1
+    exit 1
   else
     echo ""
-	printf "${green}Docker和Docker Compose已从${os_release}卸载,并清理文件夹和相关依赖. ${white}\n"
+    printf "${green}Docker和Docker Compose已从${os_release}卸载,并清理文件夹和相关依赖. ${white}\n"
     echo ""
     sleep 2s
   fi
@@ -487,13 +487,13 @@ main(){
     case "$os_release" in
       *CentOS*)
         centos_install_docker
-		generate_docker_config
-		docker_main_version
+        generate_docker_config
+        docker_main_version
         ;;
       *Ubuntu*|*Debian*)
         debian_install_docker
-		generate_docker_config
-		docker_main_version
+        generate_docker_config
+        docker_main_version
         ;;
       *)
         printf "${red}使用方法: [./get_docker.sh (uninstall)]${white}\n"
