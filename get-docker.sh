@@ -81,6 +81,7 @@ check_server_resources() {
   printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
   printf "${yellow}可用磁盘空间: ${disk_avail}${white}\n"
   printf "${yellow}内存使用率: ${mem_used_percentage}% ${white}\n"
+  echo ""
 }
 
 # 检查Docker或Docker Compose是否已安装,用于在函数操作系统安装docker中嵌套
