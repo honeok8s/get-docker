@@ -165,7 +165,7 @@ debian_install_docker(){
         gpg_key_url="https://mirrors.aliyun.com/docker-ce/linux/debian/gpg"
         ;;
       *)
-	    printf "${red}此脚本不支持的Linux发行版. ${white}\n"
+        printf "${red}此脚本不支持的Linux发行版. ${white}\n"
         exit 1
         ;;
     esac
