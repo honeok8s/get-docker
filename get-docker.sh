@@ -43,6 +43,7 @@ check_internet_connect(){
 	printf "${red}网络错误: 无法访问互联网!.${white}\n"
     exit 1
   fi
+  
   echo ""
 }
 
@@ -142,6 +143,7 @@ centos_install_docker(){
     echo ""
     sleep 2s
   fi
+  
   echo ""
 }
 
@@ -214,6 +216,7 @@ debian_install_docker(){
     echo ""
     sleep 2s
   fi
+  
   echo ""
 }
 
@@ -260,6 +263,7 @@ uninstall_docker() {
     echo ""
     sleep 2s
   fi
+  
   echo ""
 }
 
@@ -408,6 +412,7 @@ docker_main_version(){
 
   printf "${yellow}已安装Docker版本: v$docker_version ${white}\n"
   printf "${yellow}已安装Docker Compose版本: $docker_compose_version ${white}\n"
+  
   echo ""
 }
 
@@ -419,7 +424,6 @@ script_completion_message() {
   printf "${green}服务器当前时间: ${current_time} 时区: ${timezone} 脚本执行完成.${white}\n"
 
   printf "${purple}感谢使用本脚本!如有疑问,请访问 honeok.com 获取更多信息.${white}\n"
-  echo ""
 }
 
 print_getdocker_logo() {
