@@ -486,7 +486,7 @@ main(){
 		docker_main_version
         ;;
       *)
-        printf "${red}使用方法: sudo ./get_docker.sh [uninstall]${white}\n"
+        printf "${red}使用方法: [./get_docker.sh (uninstall)]${white}\n"
         exit 1
         ;;
     esac
