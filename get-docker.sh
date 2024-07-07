@@ -23,14 +23,14 @@ os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 uninstall_check_system=$(cat /etc/os-release)
 
 # ANSI颜色码,用于彩色输出
-yellow='\033[1;33m' # 提示
-red='\033[1;31m'    # 警告
-green='\033[1;32m'  # 成功
-blue='\033[1;34m'
-cyan='\033[1;36m'
-purple='\033[1;35m' # 紫 & 粉
-gray='\033[1;30m'
-white='\033[0m'     # 结尾
+yellow='\033[1;33m' # 用于提示信息
+red='\033[1;31m'    # 用于警告信息
+green='\033[1;32m'  # 用于成功信息
+blue='\033[1;34m'   # 用于一般信息
+cyan='\033[1;36m'   # 用于特殊信息
+purple='\033[1;35m' # 用于紫色或粉色信息
+gray='\033[1;30m'   # 用于灰色信息
+white='\033[0m'     # 用于结束颜色设置
 
 ################################################################################
 # Functions Definition
