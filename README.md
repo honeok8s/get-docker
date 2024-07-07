@@ -15,4 +15,4 @@ curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/dev/get-dock
 ```
 ![getdocker](img/new_dev_1.0.8.png)
 
-- 感谢B站伙伴提供的AS4837镜像加速地址，hub.littlediary.cn 不胜感激.
+- 感谢公益镜像加速源: https://note.youdao.com/s/10OwG83m ，B站: CN-JS-HuiBai，油管大佬: Kejilion 提供的加速源！
