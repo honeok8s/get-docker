@@ -13,7 +13,7 @@
 #              geographical location. It also includes uninstallation options for
 #              Docker and Docker Compose on supported Linux distributions.
 #
-# Usage: sudo ./get_docker.sh [uninstall]
+# Usage: ./get_docker.sh [uninstall]
 ################################################################################
 
 set -o errexit
