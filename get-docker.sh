@@ -236,6 +236,10 @@ uninstall_docker() {
     sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
     sudo yum remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
     sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -rf /etc/docker/*
+    # 完全卸载debian/ubuntu的docker软件安装源
+    if [ -f /etc/yum.repos.d/docker.* ];then
+      sudo rm -f /etc/yum.repos.d/docker.*
+    fi
   elif [[ $uninstall_check_system == *"Ubuntu"* ]] || [[ $uninstall_check_system == *"Debian"* ]]; then
     printf "${yellow}从${os_release}卸载Docker. ${white}\n"
     sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
