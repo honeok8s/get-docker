@@ -18,7 +18,7 @@
 
 set -o errexit
 
-gitdocker_version=(Dev:1.0.8)
+gitdocker_version=(v2.0.0)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 uninstall_check_system=$(cat /etc/os-release)
 
@@ -114,7 +114,14 @@ check_docker_installed() {
 # 在CentOS上安装Docker
 centos_install_docker(){
   local repo_url=""
-  
+
+  # 检查是否为CentOS7
+  if ! grep -q '^ID="centos"' /etc/os-release || ! grep -q '^VERSION_ID="7"' /etc/os-release; then
+    printf "${red}错误: 本脚本仅支持在CentOS7上安装Docker.${white}\n"
+    script_completion_message
+    exit 1
+  fi
+
   if [ "$(curl -s https://ipinfo.io/country)" == 'CN' ]; then
     repo_url="http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"
   else
@@ -226,6 +233,7 @@ uninstall_docker() {
   # 检查Docker是否安装
   if ! command -v docker &> /dev/null; then
     printf "${red}错误: Docker未安装在系统上,无法继续卸载.${white}\n"
+    script_completion_message
     exit 1
   fi
   
@@ -449,6 +457,7 @@ EOF
   printf "${purple}Project: https://github.com/honeok8s/get-docker ${white} \n"
   printf "${gray}############################################################## ${white} \n"
   sleep 2s
+  echo ""
 }
 
 ################################################################################
@@ -458,6 +467,20 @@ EOF
 # 检查脚本是否以root用户身份运行
 if [[ $EUID -ne 0 ]]; then
   printf "${red}此脚本必须以root用户身份运行. ${white}\n"
+  exit 1
+fi
+
+# 参数检查
+if [ -n "$1" ] && [ "$1" != "uninstall" ]; then
+  print_getdocker_logo
+  printf "${red}错误: 无效参数! (可选: 没有参数/uninstall). ${white}\n"
+  script_completion_message
+  exit 1
+fi
+if [ -n "$2" ]; then
+  print_getdocker_logo
+  printf "${red}错误: 只能提供一个参数 (可选: uninstall). ${white}\n"
+  script_completion_message
   exit 1
 fi
 
@@ -472,10 +495,12 @@ case "$os_release" in
     ;;
 esac
 
+################################################################################
+################################################################################
+
 # 开始脚本
 main(){
   print_getdocker_logo
-  echo ""
 
   # 检查网络连接
   check_internet_connect
@@ -486,30 +511,34 @@ main(){
   # 检查服务器资源
   check_server_resources
 
-  # 检查操作系统兼容性并执行安装或卸载
+  # 执行卸载 Docker
   if [ "$1" == "uninstall" ]; then
     uninstall_docker
-  else
-    case "$os_release" in
-      *CentOS*|*centos*)
-        centos_install_docker
-        generate_docker_config
-        docker_main_version
-        ;;
-      *Debian*|*debian*|*Ubuntu*|*ubuntu*)
-        debian_install_docker
-        generate_docker_config
-        docker_main_version
-        ;;
-      *)
-        printf "${red}使用方法: [./get_docker.sh (uninstall)]${white}\n"
-        exit 1
-        ;;
-    esac
+    script_completion_message
+    exit 0
   fi
+
+  # 检查操作系统兼容性并执行安装或卸载
+  case "$os_release" in
+    *CentOS*|*centos*)
+      centos_install_docker
+      generate_docker_config
+      docker_main_version
+      ;;
+    *Debian*|*debian*|*Ubuntu*|*ubuntu*)
+      debian_install_docker
+      generate_docker_config
+      docker_main_version
+      ;;
+    *)
+      printf "${red}使用方法: ./get_docker.sh [uninstall]${white}\n"
+      exit 1
+      ;;
+  esac
 
   # 完成脚本
   script_completion_message
 }
 
 main "$@"
+exit 0
