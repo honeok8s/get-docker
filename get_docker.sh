@@ -74,7 +74,7 @@ check_server_resources() {
 
   printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
   printf "${yellow}可用磁盘空间: ${disk_avail}${white}\n"
-  printf "${yellow}内存使用率: ${mem_used_percentage} ${white}\n"
+  printf "${yellow}内存使用率: ${mem_used_percentage}% ${white}\n"
 
   echo ""
 }
