@@ -13,11 +13,7 @@
 #              geographical location. It also includes uninstallation options for
 #              Docker and Docker Compose on supported Linux distributions.
 #
-# Description: 此脚本用于自动化在CentOS7.X,Debian和Ubuntu Linux发行版上安装Docker和Docker Compose.
-#              根据用户所在地区(中国或其他地区),脚本检测操作系统类型,并从官方或阿里云镜像仓库安装Docker
-#              脚本还检查网络连接,获取服务器的IPv4和IPv6 地址,并根据地理位置配置Docker配置文件.
-#              同时提供了在支持的Linux发行版上卸载Docker和Docker Compose的选项.
-#
+# Usage: sudo ./get_docker.sh [uninstall]
 ################################################################################
 
 set -o errexit
@@ -26,112 +22,85 @@ gitdocker_version=(v1.0.5)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 uninstall_check_system=$(cat /etc/os-release)
 
-# ANSI颜色码
+# ANSI颜色码,用于彩色输出
 yellow='\033[1;33m' # 提示
 red='\033[1;31m'    # 警告
 green='\033[1;32m'  # 成功
 blue='\033[1;34m'
+cyan='\033[1;36m'
 purple='\033[1;35m' # 紫 & 粉
+gray='\033[1;30m'
 white='\033[0m'     # 结尾
 
 ################################################################################
 # Functions Definition
 ################################################################################
 
-# 通过ping image.honeok.com检查是否有外网
+# 检查网络连接
 check_internet_connect(){
-  printf "${yellow}执行网络检测${white}\n"
-  if ! ping -c 1 image.honeok.com; then
-    printf "${red}网络错误!无法访问公网! ${white}\n"
+  printf "${yellow}执行网络检测.${white}\n"
+  if ! ping -c 1 image.honeok.com &> /dev/null; then
+	printf "${red}网络错误: 无法访问互联网!.${white}\n"
     exit 1
   fi
 }
 
-# 检查服务器IPV4 & IPV6
-ip_address(){
+# 获取服务器IP地址
+check_ip_address(){
   ipv4_address=$(curl -s ipv4.ip.sb)
   ipv6_address=$(curl -s --max-time 1 ipv6.ip.sb || true)
   location=$(curl -s myip.ipip.net | awk -F "来自于：" '{print $2}' | awk '{gsub(/^[[:space:]]+|[[:space:]]+$/,""); print}')
   
   printf "${yellow}当前IPv4地址: $ipv4_address ${white}\n"
-
-  if [ -n "$ipv6_address" ]; then
-    printf "${yellow}当前IPv6地址: $ipv6_address ${white}\n"
-  fi
-  
-  printf "${yellow}当前IP归属: $location ${white}\n"
+  [ -n "$ipv6_address" ] && printf "${yellow}当前IPv6地址: $ipv6_address ${white}\n"
+  printf "${yellow}IP地理位置: $location${white}\n"
   
   org_info=$(curl -s -f ipinfo.io/org)
   if [ $? -eq 0 ]; then
-    printf "${yellow}运营商: $org_info. ${white}\n"
+    printf "${yellow}ISP 提供商: $org_info.${white}\n"
   else
-    printf "${red}获取运营商信息失败. ${white}\n"
+    printf "${red}无法获取ISP信息.${white}\n"
   fi
 
   sleep 2s
   echo ""
 }
 
-# 检查Docker或Docker Compose是否已安装,用于函数嵌套
+# 检查服务器内存和硬盘可用空间
+check_server_resources() {
+  mem_total=$(free -m | awk '/^Mem:/{print $2}')
+  disk_avail=$(df -h / | awk 'NR==2 {print $4}')
+  mem_used_percentage=$(free | awk '/^Mem:/{printf("%.2f"), $3/$2*100}')
+
+  printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
+  printf "${yellow}可用磁盘空间: ${disk_avail}${white}\n"
+  printf "${yellow}内存使用率: ${mem_used_percentage}%${white}\n"
+
+  echo ""
+}
+
+# 检查Docker或Docker Compose是否已安装,用于在函数操作系统安装docker中嵌套
 check_docker_installed() {
-  if docker --version >/dev/null 2>&1; then
-    printf "${red}Docker已安装,正在退出安装程序.${white}\n"
+  if command -v docker &> /dev/null; then
+    printf "${red}Docker已安装,退出安装过程.${white}\n"
     echo ""
     script_completion_message
     exit 0
   fi
 
-  if docker compose --version >/dev/null 2>&1; then
-    printf "${red}Docker Compose(新版)已安装,正在退出安装程序.${white}\n"
+  if command -v docker-compose &> /dev/null; then
+    printf "${red}Docker Compose(旧版本)已安装.退出安装过程.${white}\n"
+	echo ""
+	script_completion_message
+	exit 0
+  fi
+
+  if command -v docker compose &> /dev/null; then
+    printf "${red}Docker Compose(新版本)已安装.退出安装过程.${white}\n"
 	echo ""
     script_completion_message
     exit 0
   fi
-
-  if docker-compose --version >/dev/null 2>&1; then
-    printf "${red}Docker Compose(旧版)已安装,正在退出安装程序.${white}\n"
-    echo ""
-    script_completion_message
-    exit 0
-  fi
-}
-
-# 检查服务器内存和硬盘可用空间
-check_server_resources() {
-  # 获取内存总量,单位为MB
-  mem_total=$(free -m | awk '/^Mem:/{print $2}')
-
-  # 获取根分区的可用空间,单位为GB
-  disk_avail=$(df -h / | awk 'NR==2 {print $4}')
-
-  # 获取内存使用百分比
-  mem_used_percentage=$(free | awk '/^Mem:/{print ($3/$2)*100}')
-
-  # 获取磁盘使用百分比
-  disk_used_percentage=$(df -h / | awk 'NR==2 {sub(/%/,"",$5); print $5}')
-
-  # 检查内存和硬盘空间
-  if (( mem_total < 900 )); then
-    printf "${red}内存小于900MB,无法继续安装 Docker.${white}\n"
-    script_completion_message
-    exit 1
-  fi
-
-  # 将硬盘可用空间转换为数值,去除单位(GB)
-  disk_avail_value=$(echo $disk_avail | awk '{gsub("G",""); print}')
-
-  # 检查硬盘空间
-  if (( disk_avail_value < 5 )); then
-    printf "${red}硬盘可用空间小于5GB,无法继续安装 Docker.${white}\n"
-    script_completion_message
-    exit 1
-  fi
-
-  # 输出剩余的内存和磁盘空间信息
-  echo ""
-  printf "${yellow}剩余内存: ${mem_total}MB,已使用内存: %.2f%%${white}\n" "$mem_used_percentage"
-  printf "${yellow}剩余磁盘空间: ${disk_avail},已使用磁盘空间: %s${white}\n" "$disk_used_percentage%"
-  echo ""
 }
 
 # 在CentOS上安装Docker
@@ -174,6 +143,7 @@ debian_install_docker(){
   local gpg_key_url=""
   local codename="$(lsb_release -cs)"
 
+  # 根据服务器位置选择镜像源
   if [ "$(curl -s https://ipinfo.io/country)" == 'CN' ]; then
     case "$os_release" in
       *ubuntu*|*Ubuntu*)
@@ -208,15 +178,15 @@ debian_install_docker(){
 
   check_docker_installed
   printf "${yellow}在${os_release}上安装Docker! ${white}\n"
-  apt install sudo >/dev/null 2>&1
 
   # 根据官方文档删除旧版本的Docker
+  apt install sudo >/dev/null 2>&1
   for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do
-    sudo apt-get remove $pkg >/dev/null 2>&1 || true
+    sudo apt remove $pkg >/dev/null 2>&1 || true
   done
 
-  sudo apt-get update >/dev/null 2>&1
-  sudo apt-get install -y ca-certificates curl
+  sudo apt update >/dev/null 2>&1
+  sudo apt install apt-transport-https ca-certificates curl gnupg lsb-release -y >/dev/null 2>&1
 
   sudo install -m 0755 -d /etc/apt/keyrings
   sudo curl -fsSL "$gpg_key_url" -o /etc/apt/keyrings/docker.asc
@@ -224,7 +194,7 @@ debian_install_docker(){
   
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] $repo_url $codename stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
   
-  sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+  sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io -y
 
   # 检查Docker服务是否处于活动状态
   if ! sudo systemctl is-active docker >/dev/null 2>&1; then
@@ -238,39 +208,49 @@ debian_install_docker(){
   fi
 }
 
-# 在CentOS上卸载Docker
-centos_uninstall_docker(){
-  printf "${yellow}从${os_release}卸载Docker. ${white}\n"
-  echo ""
-  sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true
-  sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
-  sudo yum remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
-  sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -rf /etc/docker
+# 卸载Docker
+uninstall_docker() {
+  printf "${yellow}准备卸载Docker! ${white}\n"
   sleep 2s
-  echo ""
-  printf "${green}Docker和Docker Compose已从${os_release}卸载. ${white}\n"
-  script_completion_message
-}
 
-# 在Debian/Ubuntu上卸载Docker
-debian_uninstall_docker(){
-  printf "${yellow}从${os_release}卸载Docker. ${white}\n"
-  echo ""
-  sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true
-  sudo systemctl stop docker >/dev/null 2>&1
-  sudo systemctl disable docker >/dev/null 2>&1
-  sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
-  sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -fr /etc/docker
-  if ls /etc/apt/sources.list.d/docker.* >/dev/null 2>&1; then
-    sudo rm -f /etc/apt/sources.list.d/docker.*
+  # 检查Docker是否安装
+  if ! command -v docker &> /dev/null; then
+    printf "${red}错误: Docker未安装在系统上,无法继续卸载.${white}\n"
+	exit 1
   fi
-  if ls /etc/apt/keyrings/docker.* >/dev/null 2>&1; then
-    sudo rm -f /etc/apt/keyrings/docker.*
+  
+  if [[ $uninstall_check_system == *"CentOS"* ]]; then
+    printf "${yellow}从${os_release}卸载Docker. ${white}\n"
+	sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
+    sudo yum remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
+	sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -rf /etc/docker/*
+  elif [[ $uninstall_check_system == *"Ubuntu"* ]] || [[ $uninstall_check_system == *"Debian"* ]]; then
+    printf "${yellow}从${os_release}卸载Docker. ${white}\n"
+	sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
+    sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
+    sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -fr /etc/docker/*
+	# 完全卸载debian/ubuntu的docker软件安装源
+    if ls /etc/apt/sources.list.d/docker.* >/dev/null 2>&1; then
+      sudo rm -f /etc/apt/sources.list.d/docker.*
+    fi
+    if ls /etc/apt/keyrings/docker.* >/dev/null 2>&1; then
+      sudo rm -f /etc/apt/keyrings/docker.*
+    fi
+  else
+    printf "${red}抱歉,此脚本不支持您的Linux发行版. ${white}\n"
+	exit 1
   fi
-  sleep 2s
-  echo ""
-  printf "${green}Docker和Docker Compose已从${os_release}卸载,并清理文件夹和相关依赖. ${white}\n"
-  script_completion_message
+  
+  # 检查卸载是否成功
+  if command -v docker &> /dev/null; then
+    printf "${red}错误: Docker卸载失败,请手动检查.${white}\n"
+	exit 1
+  else
+    echo ""
+	printf "${green}Docker和Docker Compose已从${os_release}卸载,并清理文件夹和相关依赖. ${white}\n"
+    echo ""
+    sleep 2s
+  fi
 }
 
 # 定义Docker配置文件
@@ -303,6 +283,7 @@ generate_docker_config(){
     "max-size": "30m",
     "max-file": "3"
   },
+  "storage-driver": "overlay2",
   "ipv6": false
 }
 EOF
@@ -328,6 +309,7 @@ EOF
      "max-size": "30m",
      "max-file": "3"
    },
+   "storage-driver": "overlay2",
    "ipv6": true,
    "fixed-cidr-v6": "fd00:dead:beef:c0::/80",
    "experimental": true,
@@ -354,6 +336,7 @@ EOF
     "max-size": "30m",
     "max-file": "3"
   },
+  "storage-driver": "overlay2",
   "ipv6": false
 }
 EOF
@@ -374,6 +357,7 @@ EOF
       "max-size": "30m",
       "max-file": "3"
     },
+	"storage-driver": "overlay2",
     "ipv6": true,
     "fixed-cidr-v6": "fd00:dead:beef:c0::/80",
     "experimental": true,
@@ -417,6 +401,18 @@ docker_main_version(){
   echo ""
 }
 
+# 退出脚本前显示执行完成信息
+script_completion_message() {
+  local timezone=$(timedatectl | awk '/Time zone/ {print $3}')
+  local current_time=$(date '+%Y-%m-%d %H:%M:%S')
+
+  echo ""
+  printf "${green}服务器当前时间: ${current_time} 时区: ${timezone} 脚本执行完成.${white}\n"
+
+  printf "${purple}感谢使用本脚本!如有疑问,请访问 honeok.com 获取更多信息.${white}\n"
+  echo ""
+}
+
 print_getdocker_logo() {
 cat << 'EOF'
    ______     __         __           __            
@@ -427,44 +423,24 @@ cat << 'EOF'
                                                     
 EOF
 
+  printf "${gray}############################################################## ${white} \n"
   printf "${yellow}Author: honeok ${white} \n"
   printf "${blue}Version: $gitdocker_version ${white} \n"
-  printf "${purple}Project:https://github.com/honeok8s ${white} \n"
-
+  printf "${purple}Project: https://github.com/honeok8s/get-docker ${white} \n"
+  printf "${gray}############################################################## ${white} \n"
   sleep 2s
   echo ""
 }
 
-# 显示Docker信息
-docker_info(){
-  printf "${yellow}正在获取Docker信息. ${white}\n"
-  sleep 2s
-  sudo docker version
-}
-
-# 退出脚本前显示执行完成信息
-script_completion_message() {
-  local timezone=$(timedatectl | awk '/Time zone/ {print $3}')
-  local current_time=$(date '+%Y-%m-%d %H:%M:%S')
-
-  echo ""
-  printf "${green}服务器当前时间: ${current_time} 时区: ${timezone} 脚本: $(basename $0) 执行完成!再见! ${white}\n"
-}
 ################################################################################
 # Main Script Execution
 ################################################################################
-
-# 打印 "gitdocker" Logo
-print_getdocker_logo
 
 # 检查脚本是否以root用户身份运行
 if [[ $EUID -ne 0 ]]; then
   printf "${red}此脚本必须以root用户身份运行. ${white}\n"
   exit 1
 fi
-
-# 获取服务器IP地址
-ip_address
 
 # 检查操作系统是否受支持(CentOS,Debian,Ubuntu)
 case "$os_release" in
@@ -477,51 +453,44 @@ case "$os_release" in
     ;;
 esac
 
-# 卸载
-if [[ "$1" == "uninstall" ]]; then
-  case "$uninstall_check_system" in
-    *CentOS*|*centos*)
-      centos_uninstall_docker
-      ;;
-    *Debian*|*debian*|*Ubuntu*|*ubuntu*)
-      debian_uninstall_docker
-      ;;
-    *)
-      printf "${red}此脚本不支持的Linux发行版. ${white}\n"
-      exit 1
-      ;;
-  esac
-  exit 0
-fi
+# 开始脚本
+main(){
+  print_getdocker_logo
+  echo ""
 
-# 根据操作系统类型安装Docker
-case "$os_release" in
-  *CentOS*|*centos*)
-    check_internet_connect
-    check_server_resources
-    centos_install_docker
-    generate_docker_config
-    ;;
-  *Debian*|*debian*|*Ubuntu*|*ubuntu*)
-    check_internet_connect
-    check_server_resources
-    debian_install_docker
-    generate_docker_config
-    ;;
-  *)
-    printf "${red}此脚本不支持的Linux发行版. ${white}\n"
-    exit 1
-    ;;
-esac
+  # 检查网络连接
+  check_internet_connect
 
-sleep 2s
+  # 获取IP地址
+  check_ip_address
 
-# 显示已安装的Docker和Docker Compose版本
-docker_main_version
+  # 检查服务器资源
+  check_server_resources
 
-# 显示Docker信息
-docker_info
+  # 检查操作系统兼容性并执行安装或卸载
+  if [ "$1" == "uninstall" ]; then
+    uninstall_docker
+  else
+    case "$os_release" in
+      *CentOS*)
+        centos_install_docker
+		generate_docker_config
+		docker_main_version
+        ;;
+      *Ubuntu*|*Debian*)
+        debian_install_docker
+		generate_docker_config
+		docker_main_version
+        ;;
+      *)
+        printf "${red}使用方法: sudo ./get_docker.sh [uninstall]${white}\n"
+        exit 1
+        ;;
+    esac
+  fi
 
-script_completion_message
+  # 完成脚本
+  script_completion_message
+}
 
-exit 0
+main "$@"
