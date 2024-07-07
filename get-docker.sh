@@ -214,7 +214,7 @@ debian_install_docker(){
 
 # 卸载Docker
 uninstall_docker() {
-  printf "${yellow}准备卸载Docker! ${white}\n"
+  printf "${yellow}准备卸载Docker. ${white}\n"
   sleep 2s
 
   # 检查Docker是否安装
@@ -410,7 +410,6 @@ script_completion_message() {
   local timezone=$(timedatectl | awk '/Time zone/ {print $3}')
   local current_time=$(date '+%Y-%m-%d %H:%M:%S')
 
-  echo ""
   printf "${green}服务器当前时间: ${current_time} 时区: ${timezone} 脚本执行完成.${white}\n"
 
   printf "${purple}感谢使用本脚本!如有疑问,请访问 honeok.com 获取更多信息.${white}\n"
