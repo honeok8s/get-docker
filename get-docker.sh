@@ -60,7 +60,7 @@ check_ip_address(){
 	org_info=$(curl -s -f ipinfo.io/org)
 	if [ $? -eq 0 ]; then
 		printf "${yellow}ISP 提供商: $org_info.${white}\n"
-		else
+	else
 		printf "${red}无法获取ISP信息.${white}\n"
 	fi
 
