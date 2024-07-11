@@ -18,7 +18,7 @@
 
 set -o errexit
 
-gitdocker_version=(v2.0.0)
+gitdocker_version=(v2.0.1)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 uninstall_check_system=$(cat /etc/os-release)
 
@@ -312,17 +312,23 @@ generate_docker_config(){
 EOF
 )
 
+  # registry-mirrors 配置
+  local registry_mirrors_config=$(cat <<EOF
+  "registry-mirrors": [
+    "https://hub.littlediary.cn",
+    "https://registry.honeok.com",
+    "https://docker.kejilion.pro"
+  ]
+EOF
+)
+
 # 根据条件生成不同的配置
   if [ "$is_china_server" == 'true' ]; then
     if [ -n "$ipv6_address" ]; then
       # 中国服务器且存在IPv6
       local china_with_ipv6_config=$(cat <<EOF
 {
-  "registry-mirrors": [
-    "https://hub.littlediary.cn",
-    "https://registry.honeok.com",
-    "https://docker.kejilion.pro"
-   ],
+   $registry_mirrors_config,
    "exec-opts": [
      "native.cgroupdriver=systemd"
     ],
@@ -346,11 +352,7 @@ EOF
        # 中国服务器但只有IPv4
        local china_with_ipv4_config=$(cat <<EOF
 {
-  "registry-mirrors": [
-    "https://hub.littlediary.cn",
-    "https://registry.honeok.com",
-    "https://docker.kejilion.pro"
-  ],
+  $registry_mirrors_config,
   "exec-opts": [
     "native.cgroupdriver=systemd"
   ],
