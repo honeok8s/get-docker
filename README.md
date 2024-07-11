@@ -18,6 +18,6 @@ curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-doc
 ./get-docker.sh uninstall
 ```
 ![getdocker](img/new_dev_1.0.8.png)
-![getdocker](img/v2.0.1_centos)
+![getdocker](img/v2.0.1_centos.png)
 
 - 感谢B站: CN-JS-HuiBai
