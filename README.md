@@ -18,6 +18,6 @@ curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-doc
 ./get-docker.sh uninstall
 ```
 ![getdocker](img/v2.0.1_debian11.png)
-![getdocker](img/v2.0.1_centos.png)
+![getdocker](img/v2.0.1_debian12.png)
 
 - 感谢B站: CN-JS-HuiBai
