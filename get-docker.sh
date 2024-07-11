@@ -462,7 +462,6 @@ cat << 'EOF'
                                                     
 EOF
 
-
 	printf "${gray}############################################################## ${white} \n"
 	printf "${yellow}Author: honeok ${white} \n"
 	printf "${blue}Version: $gitdocker_version ${white} \n"
@@ -489,6 +488,7 @@ if [ -n "$1" ] && [ "$1" != "uninstall" ]; then
 	script_completion_message
 	exit 1
 fi
+
 if [ -n "$2" ]; then
 	print_getdocker_logo
 	printf "${red}错误: 只能提供一个参数 (可选: uninstall). ${white}\n"
