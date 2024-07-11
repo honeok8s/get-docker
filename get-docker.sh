@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ################################################################################
 # Author: honeok
 # Blog: honeok.com
@@ -43,7 +42,7 @@ check_internet_connect(){
 		printf "${red}网络错误: 无法访问互联网!.${white}\n"
 		exit 1
 	fi
-  
+
 	echo ""
 }
 
@@ -52,7 +51,7 @@ check_ip_address(){
 	ipv4_address=$(curl -s ipv4.ip.sb)
 	ipv6_address=$(curl -s --max-time 1 ipv6.ip.sb || true)
 	location=$(curl -s myip.ipip.net | awk -F "来自于：" '{print $2}' | awk '{gsub(/^[[:space:]]+|[[:space:]]+$/,""); print}')
-  
+
 	printf "${yellow}当前IPv4地址: $ipv4_address ${white}\n"
 	[ -n "$ipv6_address" ] && printf "${yellow}当前IPv6地址: $ipv6_address ${white}\n"
 	printf "${yellow}IP地理位置: $location${white}\n"
@@ -148,7 +147,7 @@ centos_install_docker(){
 		printf "${green}Docker已完成自检,启动并设置开机自启. ${white}\n"
 		sleep 2s
 	fi
-  
+
 	echo ""
 }
 
@@ -207,10 +206,10 @@ debian_install_docker(){
 	sudo install -m 0755 -d /etc/apt/keyrings
 	sudo curl -fsSL "$gpg_key_url" -o /etc/apt/keyrings/docker.asc
 	sudo chmod a+r /etc/apt/keyrings/docker.asc
-  
+
 	# 添加Docker的软件源
 	echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] $repo_url $codename stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-  
+
 	sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io -y
 
 	# 检查Docker服务是否处于活动状态
@@ -221,7 +220,7 @@ debian_install_docker(){
 		printf "${green}Docker已完成自检,启动并设置开机自启. ${white}\n"
 		sleep 2s
 	fi
-  
+
 	echo ""
 }
 
@@ -236,7 +235,7 @@ uninstall_docker() {
 		script_completion_message
 		exit 1
 	fi
-  
+
 	if [[ $uninstall_check_system == *"CentOS"* ]]; then
 		printf "${yellow}从${os_release}卸载Docker. ${white}\n"
 		sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
@@ -262,7 +261,7 @@ uninstall_docker() {
 		printf "${red}抱歉,此脚本不支持您的Linux发行版. ${white}\n"
 		exit 1
 	fi
-  
+
 	# 检查卸载是否成功
 	if command -v docker &> /dev/null; then
 		printf "${red}错误: Docker卸载失败,请手动检查.${white}\n"
@@ -272,7 +271,7 @@ uninstall_docker() {
 		printf "${green}Docker和Docker Compose已从${os_release}卸载,并清理文件夹和相关依赖. ${white}\n"
 		sleep 2s
 	fi
-  
+
 	echo ""
 }
 
@@ -416,7 +415,7 @@ docker_main_version(){
 	elif command -v docker.io >/dev/null 2>&1; then
 		docker_version=$(docker.io --version | awk '{gsub(/,/, "", $3); print $3}')
 	fi
-  
+
 	if command -v docker-compose >/dev/null 2>&1; then
 		docker_compose_version=$(docker-compose version | awk 'NR==1{print $4}')
 	elif command -v docker >/dev/null 2>&1 && docker compose --version >/dev/null 2>&1; then
@@ -427,7 +426,7 @@ docker_main_version(){
 	printf "${yellow}已安装Docker Compose版本: $docker_compose_version ${white}\n"
 
 	echo ""
-  
+
 	printf "${yellow}正在获取Docker信息. ${white}\n"
 	sleep 2s
 	sudo docker version
