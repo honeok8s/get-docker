@@ -321,9 +321,6 @@ EOF
   "registry-mirrors": [
     "https://hub.littlediary.cn",
     "https://registry.honeok.com",
-    "https://reg-hub1.onrender.com",
-    "https://reg-k8s.onrender.com",
-    "https://reg-quay.onrender.com",
     "https://docker.kejilion.pro"
    ],
    "exec-opts": [
@@ -352,9 +349,6 @@ EOF
   "registry-mirrors": [
     "https://hub.littlediary.cn",
     "https://registry.honeok.com",
-    "https://reg-hub1.onrender.com",
-    "https://reg-k8s.onrender.com",
-    "https://reg-quay.onrender.com",
     "https://docker.kejilion.pro"
   ],
   "exec-opts": [
