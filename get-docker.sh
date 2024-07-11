@@ -462,6 +462,7 @@ cat << 'EOF'
                                                     
 EOF
 
+
 	printf "${gray}############################################################## ${white} \n"
 	printf "${yellow}Author: honeok ${white} \n"
 	printf "${blue}Version: $gitdocker_version ${white} \n"
@@ -511,6 +512,7 @@ esac
 
 # 开始脚本
 main(){
+	# 打印Logo
 	print_getdocker_logo
 
 	# 检查网络连接
