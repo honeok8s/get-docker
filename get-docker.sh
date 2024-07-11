@@ -434,6 +434,12 @@ docker_main_version(){
 	echo ""
 }
 
+# 配置文件优化和显示已安装版本总函数
+config_and_display() {
+	generate_docker_config
+	docker_main_version
+}
+
 # 退出脚本前显示执行完成信息
 script_completion_message() {
 	local timezone=$(timedatectl | awk '/Time zone/ {print $3}')
@@ -525,13 +531,11 @@ main(){
 	case "$os_release" in
 	*CentOS*|*centos*)
 		centos_install_docker
-		generate_docker_config
-		docker_main_version
+		$config_and_display
 		;;
 	*Debian*|*debian*|*Ubuntu*|*ubuntu*)
 		debian_install_docker
-		generate_docker_config
-		docker_main_version
+		$config_and_display
 		;;
 	*)
 		printf "${red}使用方法: ./get_docker.sh [uninstall]${white}\n"
