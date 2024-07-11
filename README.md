@@ -5,6 +5,11 @@ docker & docker-compose一键部署最新版，根据IP归属指定对应配置�
 
 - 使用方法
 ```shell
+# 直接运行
+bash <(wget -qO- https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh)
+```
+
+```shell
 curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh && chmod +x ./get-docker.sh
 
 # 默认安装 Docker
