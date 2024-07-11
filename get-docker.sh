@@ -18,7 +18,7 @@
 ################################################################################
 
 set -o errexit
-
+clear
 gitdocker_version=(v2.0.1)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 uninstall_check_system=$(cat /etc/os-release)
