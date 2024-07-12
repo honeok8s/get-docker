@@ -107,7 +107,7 @@ centos_install_docker(){
 
 	# 检查是否为CentOS7
 	if ! grep -q '^ID="centos"' /etc/os-release || ! grep -q '^VERSION_ID="7"' /etc/os-release; then
-		printf "${red}错误: 本脚本仅支持在CentOS7上安装Docker.${white}\n"
+		printf "${red}错误: 检测到操作系统为CentOS,但本脚本仅支持在CentOS7上安装Docker,如有需求请 honeok.com 留言.${white}\n"
 		script_completion_message
 		exit 1
 	fi
