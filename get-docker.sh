@@ -464,7 +464,7 @@ docker_main_version(){
 
 # 推荐机场节点
 print_recommendations() {
-    	# 快连
+	# 快连
 	printf "${yellow}推${purple}荐${blue}自${green}用${red}机${cyan}场${white}: ${orange}https://user.vipthree.xyz/register?aff=1044562${white}\n"
 }
 
