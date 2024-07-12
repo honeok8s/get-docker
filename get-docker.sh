@@ -25,8 +25,6 @@ cyan='\033[1;36m'   # 特殊信息
 purple='\033[1;35m' # 紫色或粉色信息
 gray='\033[1;30m'   # 灰色信息
 white='\033[0m'     # 结束颜色设置
-blink='\033[5m'     # 闪烁效果
-orange='\033[1;33m' # 橙色信息
 
 # 检查网络连接
 check_internet_connect(){
@@ -465,7 +463,7 @@ docker_main_version(){
 # 推荐机场节点
 print_recommendations() {
 	# 快连
-	printf "${yellow}推${purple}荐${blue}自${green}用${red}机${cyan}场${white}: ${orange}https://user.vipthree.xyz/register?aff=1044562${white}\n"
+	printf "${yellow}推${purple}荐${blue}自${green}用${red}机${cyan}场${white}: ${purple}https://user.vipthree.xyz/register?aff=1044562${white}\n"
 }
 
 # 退出脚本前显示执行完成信息
