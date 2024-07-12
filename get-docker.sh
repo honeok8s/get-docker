@@ -461,11 +461,8 @@ docker_main_version(){
 	echo ""
 }
 
-# 推荐撸管网站和机场节点
+# 推荐机场节点
 print_recommendations() {
-    # 爱情岛
-    printf "${red}撸管圣地${green}爱情${yellow}岛${blue}社区: → ${cyan}www.cqacon.com${white}\n"
-
     # 快连
     printf "${yellow}推荐${purple}自用机场: → ${blue}https://user.vipthree.xyz/register?aff=1044562${white}\n"
 }
