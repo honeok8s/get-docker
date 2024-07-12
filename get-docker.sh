@@ -12,9 +12,9 @@
 
 set -o errexit
 clear
+
 gitdocker_version=(v2.0.1)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
-uninstall_check_system=$(cat /etc/os-release)
 
 # ANSI颜色码,用于彩色输出
 yellow='\033[1;33m' # 提示信息
@@ -26,14 +26,10 @@ purple='\033[1;35m' # 紫色或粉色信息
 gray='\033[1;30m'   # 灰色信息
 white='\033[0m'     # 结束颜色设置
 
-################################################################################
-# Functions Definition
-################################################################################
-
 # 检查网络连接
 check_internet_connect(){
 	printf "${yellow}执行网络检测.${white}\n"
-	if ! ping -c 1 image.honeok.com &> /dev/null; then
+	if ! ping -c 2 image.honeok.com &> /dev/null; then
 		printf "${red}网络错误: 无法访问互联网!.${white}\n"
 		exit 1
 	fi
@@ -221,6 +217,7 @@ debian_install_docker(){
 
 # 卸载Docker
 uninstall_docker() {
+	local uninstall_check_system=$(cat /etc/os-release)
 	printf "${yellow}准备卸载Docker. ${white}\n"
 	sleep 2s
 
@@ -458,10 +455,7 @@ EOF
 	echo ""
 }
 
-################################################################################
-# Main Script Execution
-################################################################################
-
+# 执行逻辑
 # 检查脚本是否以root用户身份运行
 if [[ $EUID -ne 0 ]]; then
 	printf "${red}此脚本必须以root用户身份运行. ${white}\n"
