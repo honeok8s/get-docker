@@ -464,10 +464,10 @@ docker_main_version(){
 # 推荐撸管网站和机场节点
 print_recommendations() {
     # 爱情岛
-    printf "${green}爱情${yellow}岛${blue}社区: ${cyan}www.cqacon.com${white}\n"
+    printf "${red}撸管圣地${green}爱情${yellow}岛${blue}社区: → ${cyan}www.cqacon.com${white}\n"
 
     # 快连
-    printf "${purple}自用机场: ${blue}https://user.vipthree.xyz/register?aff=1044562${white}\n"
+    printf "${yellow}推荐${purple}自用机场: → ${blue}https://user.vipthree.xyz/register?aff=1044562${white}\n"
 }
 
 # 退出脚本前显示执行完成信息
