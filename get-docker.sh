@@ -465,7 +465,7 @@ docker_main_version(){
 # 推荐机场节点
 print_recommendations() {
     	# 快连
-	printf "${yellow}荐${purple}自${blue}用${white}机${yellow}场: ${purple}→ ${blue}https://${white}user.${yellow}vip${purple}three.${blue}xyz/${white}register?${yellow}aff=${purple}1044562${white}\n${reset}"
+	printf "${yellow}推荐${purple}自${blue}用${white}机${yellow}场: ${purple}→ ${blue}https://${white}user.${yellow}vip${purple}three.${blue}xyz/${white}register?${yellow}aff=${purple}1044562${white}\n${reset}"
 }
 
 # 退出脚本前显示执行完成信息
