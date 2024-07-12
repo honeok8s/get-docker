@@ -13,7 +13,7 @@
 set -o errexit
 clear
 
-gitdocker_version=(v2.0.2)
+gitdocker_version="v2.0.2 更新时间: 2024.7.12"
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 
 # ANSI颜色码,用于彩色输出
