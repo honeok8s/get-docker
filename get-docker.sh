@@ -13,7 +13,7 @@
 set -o errexit
 clear
 
-gitdocker_version=(v2.0.1)
+gitdocker_version=(v2.0.2)
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 
 # ANSI颜色码,用于彩色输出
@@ -60,17 +60,26 @@ check_ip_address(){
 
 # 检查服务器内存和硬盘可用空间
 check_server_resources() {
-	# 获取内存总量
+	# 获取内存总量、已用内存和可用内存
 	mem_total=$(free -m | awk '/^Mem:/{print $2}')
-	# 获取根分区可用磁盘空间
-	disk_avail=$(df -h / | awk 'NR==2 {print $4}')
-	# 计算内存使用率并格式化为两位小数
-	mem_used_percentage=$(free | awk '/^Mem:/{printf("%.2f%%", $3/$2*100)}')
+	mem_used=$(free -m | awk '/^Mem:/{print $3}')
+	mem_free=$(free -m | awk '/^Mem:/{print $7}')
 
-	# 打印服务器内存和磁盘信息
+	# 计算内存使用率
+	mem_used_percentage=$(awk "BEGIN {printf \"%.2f\", ${mem_used}/${mem_total}*100}")
+
+	# 打印服务器内存信息
 	printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
-	printf "${yellow}可用磁盘空间: ${disk_avail}${white}\n"
-	printf "${yellow}内存使用率: ${mem_used_percentage}% ${white}\n"
+	printf "${yellow}已用内存: ${mem_used}MB (${mem_used_percentage}%%)${white}\n"
+	printf "${yellow}可用内存: ${mem_free}MB${white}\n"
+
+	# 遍历实际挂载的磁盘分区,排除常见的系统分区
+	printf "${yellow}磁盘分区使用情况:${white}\n"
+	df -h | awk -v yellow="$yellow" -v white="$white" '
+	NR>1 && !/^(udev|tmpfs|overlay|devpts|sysfs|proc)/ {
+		printf "  - %-10s: 总量 %-5s, 已用 %-5s, 可用 %-5s, 使用率: %s\n", 
+			$1, yellow $2 white, yellow $3 white, yellow $4 white, yellow $5 white
+	}'
 
 	echo ""
 }
