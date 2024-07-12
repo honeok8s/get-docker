@@ -25,6 +25,7 @@ cyan='\033[1;36m'   # 特殊信息
 purple='\033[1;35m' # 紫色或粉色信息
 gray='\033[1;30m'   # 灰色信息
 white='\033[0m'     # 结束颜色设置
+blink='\033[5m'     # 闪烁效果
 
 # 检查网络连接
 check_internet_connect(){
@@ -74,18 +75,37 @@ check_server_resources() {
 	printf "${yellow}可用内存: ${mem_free}MB${white}\n"
 
 	# 检查内存使用率是否超过85%
+	mem_full=0
 	if [ "$mem_used_percentage" -gt 85 ]; then
 		printf "${red}内存使用率超过85%%! 当前使用率: ${mem_used_percentage}%%, 脚本即将退出.${white}\n"
+		script_completion_message
 		exit 1
+	else
+		mem_full=1
 	fi
 
 	# 遍历实际挂载的磁盘分区, 只显示物理磁盘
 	printf "${yellow}磁盘分区使用情况:${white}\n"
-	df -h | awk -v yellow="$yellow" -v white="$white" '
+	disk_full=0
+	df -h | awk -v yellow="$yellow" -v white="$white" -v disk_full="$disk_full" '
 	NR > 1 && ($1 ~ /^\/dev\/(sd|vd|nvme|mmcblk)/) {
 		printf yellow "  - %-10s: 总量 %-5s, 已用 %-5s, 可用 %-5s, 使用率: %s" white "\n", 
 			$1, $2, $3, $4, $5
+		disk = substr($5, 1, length($5) - 1)  # 去掉百分号
+		if (disk + 0 > 85) {
+			printf red "    警告: 磁盘使用率超过85%%! 当前使用率: %s${white}\n", $5
+			disk_full=1
+		}
 	}'
+
+	# 如果内存和磁盘使用率都在安全范围内,打印提示信息
+	if [ "$mem_full" -eq 1 ] && [ "$disk_full" -eq 0 ]; then
+		printf "${green}内存和磁盘资源充足! ${white}\n"
+	elif [ "$mem_full" -eq 1 ]; then
+		printf "${green}内存资源充足,但磁盘使用率过高!${white}\n"
+	elif [ "$disk_full" -eq 1 ]; then
+		printf "${red}磁盘使用率过高,请检查!${white}\n"
+	fi
 
 	echo ""
 }
@@ -441,6 +461,15 @@ docker_main_version(){
 	echo ""
 }
 
+# 推荐撸管网站和机场节点
+print_recommendations() {
+    # 爱情岛
+    printf "${green}爱情${yellow}岛${blue}社区: ${cyan}www.cqacon.com${white}\n"
+
+    # 快连
+    printf "${purple}自用机场: ${blue}https://user.vipthree.xyz/register?aff=1044562${white}\n"
+}
+
 # 退出脚本前显示执行完成信息
 script_completion_message() {
 	local timezone=$(timedatectl | awk '/Time zone/ {print $3}')
@@ -465,6 +494,8 @@ EOF
 	printf "${yellow}Author: honeok ${white} \n"
 	printf "${blue}Version: $gitdocker_version ${white} \n"
 	printf "${purple}Project: https://github.com/honeok8s/get-docker ${white} \n"
+	echo ""
+	print_recommendations
 	printf "${gray}############################################################## ${white} \n"
 	sleep 2s
 	echo ""
