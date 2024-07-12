@@ -65,20 +65,26 @@ check_server_resources() {
 	mem_used=$(free -m | awk '/^Mem:/{print $3}')
 	mem_free=$(free -m | awk '/^Mem:/{print $7}')
 
-	# 计算内存使用率
-	mem_used_percentage=$(awk "BEGIN {printf \"%.2f\", ${mem_used}/${mem_total}*100}")
+	# 计算内存使用率（整数形式）
+	mem_used_percentage=$((mem_used * 100 / mem_total))
 
 	# 打印服务器内存信息
 	printf "${yellow}服务器内存总量: ${mem_total}MB${white}\n"
 	printf "${yellow}已用内存: ${mem_used}MB (${mem_used_percentage}%%)${white}\n"
 	printf "${yellow}可用内存: ${mem_free}MB${white}\n"
 
-	# 遍历实际挂载的磁盘分区,排除常见的系统分区
+	# 检查内存使用率是否超过85%
+	if [ "$mem_used_percentage" -gt 85 ]; then
+		printf "${red}内存使用率超过85%%! 当前使用率: ${mem_used_percentage}%%, 脚本即将退出.${white}\n"
+		exit 1
+	fi
+
+	# 遍历实际挂载的磁盘分区, 只显示物理磁盘
 	printf "${yellow}磁盘分区使用情况:${white}\n"
 	df -h | awk -v yellow="$yellow" -v white="$white" '
-	NR>1 && !/^(udev|tmpfs|overlay|devpts|sysfs|proc)/ {
-		printf "  - %-10s: 总量 %-5s, 已用 %-5s, 可用 %-5s, 使用率: %s\n", 
-			$1, yellow $2 white, yellow $3 white, yellow $4 white, yellow $5 white
+	NR > 1 && ($1 ~ /^\/dev\/(sd|vd|nvme|mmcblk)/) {
+		printf yellow "  - %-10s: 总量 %-5s, 已用 %-5s, 可用 %-5s, 使用率: %s" white "\n", 
+			$1, $2, $3, $4, $5
 	}'
 
 	echo ""
