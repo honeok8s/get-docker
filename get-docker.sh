@@ -190,7 +190,7 @@ debian_install_docker(){
 		sudo apt remove $pkg >/dev/null 2>&1 || true
 	done
 
-	sudo apt update >/dev/null 2>&1
+	sudo apt update -y >/dev/null 2>&1
 	sudo apt install apt-transport-https ca-certificates curl gnupg lsb-release -y >/dev/null 2>&1
 
 	# 下载并安装Docker的GPG密钥
@@ -201,7 +201,7 @@ debian_install_docker(){
 	# 添加Docker的软件源
 	echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] $repo_url $codename stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
-	sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io -y
+	sudo apt update -y && sudo apt install docker-ce docker-ce-cli containerd.io -y
 
 	# 检查Docker服务是否处于活动状态
 	if ! sudo systemctl is-active docker >/dev/null 2>&1; then
