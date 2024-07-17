@@ -267,7 +267,11 @@ uninstall_docker() {
 		sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
 		sudo yum remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
 		sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -rf /etc/docker/*
-		# 完全卸载debian/ubuntu的docker软件安装源
+		# 删除/opt/containerd目录
+  		if [ -d /opt/containerd ]; then
+    			sudo rm -fr /opt/containerd >/dev/null 2>&1
+       		fi
+		# 完全卸载CentOS的docker软件安装源
 		if [ -f /etc/yum.repos.d/docker.* ];then
 			sudo rm -f /etc/yum.repos.d/docker.*
 		fi
@@ -276,6 +280,10 @@ uninstall_docker() {
 		sudo docker rm -f $(docker ps -q) >/dev/null 2>&1 || true && sudo systemctl stop docker >/dev/null 2>&1 && sudo systemctl disable docker >/dev/null 2>&1
 		sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras -y
 		sudo rm -fr /var/lib/docker && sudo rm -fr /var/lib/containerd && sudo rm -fr /etc/docker/*
+  		# 删除/opt/containerd目录
+  		if [ -d /opt/containerd ]; then
+    			sudo rm -fr /opt/containerd >/dev/null 2>&1
+       		fi
 		# 完全卸载debian/ubuntu的docker软件安装源
 		if ls /etc/apt/sources.list.d/docker.* >/dev/null 2>&1; then
 			sudo rm -f /etc/apt/sources.list.d/docker.*
