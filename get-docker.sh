@@ -342,7 +342,7 @@ local registry_mirrors_config=$(cat <<EOF
   "registry-mirrors": [
     "https://hub.littlediary.cn",
     "https://registry.honeok.com",
-    "https://docker.kejilion.pro"
+    "https://h.ysicing.net"
   ]
 EOF
 )
