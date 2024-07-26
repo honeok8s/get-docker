@@ -7,6 +7,9 @@ docker & docker-compose一键部署最新版，根据IP归属指定对应配置�
 ```shell
 bash <(wget -qO- https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh)
 ```
+```shell
+curl -fsSL https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh | bash -
+```
 - 下载本地运行
 ```shell
 curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh && chmod +x ./get-docker.sh
