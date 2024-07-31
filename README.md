@@ -22,5 +22,3 @@ curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-doc
 ```
 
 ![getdocker](img/v2.0.1_debian12.png)
-
-- 感谢B站: CN-JS-HuiBai
