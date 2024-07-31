@@ -13,7 +13,7 @@
 set -o errexit
 clear
 
-gitdocker_version="v2.0.3 更新时间: 2024.7.31"
+gitdocker_version="v2.0.2 更新时间: 2024.7.17"
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 
 # ANSI颜色码,用于彩色输出
@@ -309,7 +309,12 @@ uninstall_docker() {
 	echo ""
 }
 
-# 动态生成并加载Docker配置文件,确保最佳的镜像下载和网络配置
+# 定义Docker配置文件
+# 如果服务器在中国,并且有IPv6地址,则使用中国的镜像加速器和IPv6配置
+# 如果服务器在中国,但只有IPv4地址，则仅使用中国的镜像加速器
+# 如果服务器在非中国地区,并且有IPv6地址,则使用IPv6配置
+# 默认情况下,对于非中国地区且只有IPv4地址的服务器,使用基本配置
+# 根据服务器的实际情况动态生成并加载Docker配置文件,确保最佳的镜像下载和网络配置
 generate_docker_config(){
 	local config_file="/etc/docker/daemon.json"
 	local ipv4_address=$(curl -s ipv4.ip.sb)
@@ -463,6 +468,12 @@ docker_main_version(){
 	echo ""
 }
 
+# 推荐机场节点
+print_recommendations() {
+	# 快连
+	printf "${yellow}推${purple}荐${blue}自${green}用${red}机${cyan}场${white}: ${purple}https://user.vipthree.xyz/register?aff=1044562${white}\n"
+}
+
 # 退出脚本前显示执行完成信息
 script_completion_message() {
 	local timezone=$(timedatectl | awk '/Time zone/ {print $3}')
@@ -487,6 +498,8 @@ EOF
 	printf "${yellow}Author: honeok ${white} \n"
 	printf "${blue}Version: $gitdocker_version ${white} \n"
 	printf "${purple}Project: https://github.com/honeok8s/get-docker ${white} \n"
+	echo ""
+	print_recommendations
 	printf "${gray}############################################################## ${white} \n"
 	sleep 2s
 	echo ""
@@ -530,13 +543,6 @@ main(){
 	# 打印Logo
 	print_getdocker_logo
 
-	# 执行卸载 Docker
-	if [ "$1" == "uninstall" ]; then
-		uninstall_docker
-		script_completion_message
-		exit 0
-	fi
-
 	# 检查网络连接
 	check_internet_connect
 
@@ -545,6 +551,13 @@ main(){
 
 	# 检查服务器资源
 	check_server_resources
+
+	# 执行卸载 Docker
+	if [ "$1" == "uninstall" ]; then
+		uninstall_docker
+		script_completion_message
+		exit 0
+	fi
 
 	# 检查操作系统兼容性并执行安装或卸载
 	case "$os_release" in
