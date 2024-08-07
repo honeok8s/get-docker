@@ -13,7 +13,7 @@
 set -o errexit
 clear
 
-gitdocker_version="v2.0.3 更新时间: 2024.7.31"
+gitdocker_version="v2.0.4 2024.8.7"
 os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f 2)
 
 # ANSI颜色码,用于彩色输出
@@ -25,6 +25,35 @@ cyan='\033[1;36m'   # 特殊信息
 purple='\033[1;35m' # 紫色或粉色信息
 gray='\033[1;30m'   # 灰色信息
 white='\033[0m'     # 结束颜色设置
+
+# 安装软件包
+install(){
+	if [ $# -eq 0 ]; then
+		_red "未提供软件包参数"
+		return 1
+	fi
+
+	for package in "$@"; do
+		if ! command -v "$package" &>/dev/null; then
+			_yellow "正在安装 $package"
+			if command -v dnf &>/dev/null; then
+				dnf install -y "$package"
+			elif command -v yum &>/dev/null; then
+				yum -y install "$package"
+			elif command -v apt &>/dev/null; then
+				apt update && apt install -y "$package"
+			elif command -v apk &>/dev/null; then
+				apk add "$package"
+			else
+				_red "未知的包管理器"
+				return 1
+			fi
+		else
+			_green "$package已安装"
+		fi
+	done
+	return 0
+}
 
 # 检查网络连接
 check_internet_connect(){
@@ -54,7 +83,7 @@ check_ip_address(){
 		printf "${red}无法获取ISP信息.${white}\n"
 	fi
 
-	sleep 2s
+	sleep 1s
 	echo ""
 }
 
@@ -310,121 +339,55 @@ uninstall_docker() {
 }
 
 # 动态生成并加载Docker配置文件,确保最佳的镜像下载和网络配置
-generate_docker_config(){
+generate_docker_config() {
 	local config_file="/etc/docker/daemon.json"
-	local ipv4_address=$(curl -s ipv4.ip.sb)
-	local ipv6_address=$(curl -s --max-time 1 ipv6.ip.sb)
 	local is_china_server='false'
+	install python3
 
 	# 检查服务器是否在中国
 	if [ "$(curl -s https://ipinfo.io/country)" == 'CN' ]; then
 		is_china_server='true'
 	fi
 
-# 基本配置模板
-local base_config=$(cat <<EOF
-{
-  "exec-opts": [
-    "native.cgroupdriver=systemd"
-  ],
-  "max-concurrent-downloads": 10,
-  "max-concurrent-uploads": 5,
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "30m",
-    "max-file": "3"
-  },
-  "storage-driver": "overlay2",
-  "ipv6": false
-}
-EOF
-)
+	# Python脚本
+	python3 - <<EOF
+import json
+import sys
 
-# registry-mirrors 配置
-local registry_mirrors_config=$(cat <<EOF
-  "registry-mirrors": [
-    "https://hub.littlediary.cn",
-    "https://registry.honeok.com",
-    "https://h.ysicing.net"
-  ]
-EOF
-)
+registry_mirrors = [
+	"https://hub.littlediary.cn",
+	"https://registry.honeok.com",
+	"https://h.ysicing.net"
+]
 
-# 根据条件生成不同的配置
-if [ "$is_china_server" == 'true' ]; then
-	if [ -n "$ipv6_address" ]; then
-	# 中国服务器且存在IPv6
-		local china_with_ipv6_config=$(cat <<EOF
-{
-   $registry_mirrors_config,
-   "exec-opts": [
-     "native.cgroupdriver=systemd"
-    ],
-   "max-concurrent-downloads": 10,
-   "max-concurrent-uploads": 5,
-   "log-driver": "json-file",
-   "log-opts": {
-     "max-size": "30m",
-     "max-file": "3"
-   },
-   "storage-driver": "overlay2",
-   "ipv6": true,
-   "fixed-cidr-v6": "fd00:dead:beef:c0::/80",
-   "experimental": true,
-   "ip6tables": true
-}
-EOF
-)
-		echo "$china_with_ipv6_config" > "$config_file"
-	else
-		# 中国服务器但只有IPv4
-		local china_with_ipv4_config=$(cat <<EOF
-{
-  $registry_mirrors_config,
-  "exec-opts": [
-    "native.cgroupdriver=systemd"
-  ],
-  "max-concurrent-downloads": 10,
-  "max-concurrent-uploads": 5,
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "30m",
-    "max-file": "3"
-  },
-  "storage-driver": "overlay2",
-  "ipv6": false
-}
-EOF
-)
-		echo "$china_with_ipv4_config" > "$config_file"
-	fi
-	elif [ -n "$ipv6_address" ]; then
-		# 非中国服务器但存在IPv6
-		local non_china_with_ipv6_config=$(cat <<EOF
-{
-    "exec-opts": [
-      "native.cgroupdriver=systemd"
-    ],
-    "max-concurrent-downloads": 10,
-    "max-concurrent-uploads": 5,
-    "log-driver": "json-file",
-    "log-opts": {
-      "max-size": "30m",
-      "max-file": "3"
-    },
+base_config = {
+	"exec-opts": [
+		"native.cgroupdriver=systemd"
+	],
+	"max-concurrent-downloads": 10,
+	"max-concurrent-uploads": 5,
+	"log-driver": "json-file",
+	"log-opts": {
+		"max-size": "30m",
+		"max-file": "3"
+	},
 	"storage-driver": "overlay2",
-    "ipv6": true,
-    "fixed-cidr-v6": "fd00:dead:beef:c0::/80",
-    "experimental": true,
-    "ip6tables": true
+	"ipv6": False
 }
+
+# 如果是中国服务器，将 registry-mirrors 放在前面
+if "$is_china_server" == "true":
+	config = {
+		"registry-mirrors": registry_mirrors,
+		**base_config
+	}
+else:
+	config = base_config
+
+with open("/etc/docker/daemon.json", "w") as f:
+	json.dump(config, f, indent=4)
+
 EOF
-)
-		echo "$non_china_with_ipv6_config" > "$config_file"
-	else
-		# 默认情况,非中国服务器且只有IPv4
-		echo "$base_config" > "$config_file"
-	fi
 
 	# 校验和重新加载Docker守护进程
 	printf "${green}Docker配置文件已重新加载并重启Docker服务. ${white}\n"
