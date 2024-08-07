@@ -45,11 +45,11 @@ install(){
 			elif command -v apk &>/dev/null; then
 				apk add "$package"
 			else
-				_red "未知的包管理器"
+				printf "${red}未知的包管理器${white}\n"
 				return 1
 			fi
 		else
-			_green "$package已安装"
+			printf "${green}${package}已安装${white}\n"
 		fi
 	done
 	return 0
