@@ -29,13 +29,13 @@ white='\033[0m'     # 结束颜色设置
 # 安装软件包
 install(){
 	if [ $# -eq 0 ]; then
-		_red "未提供软件包参数"
+		printf "${red}未提供软件包参数${white}\n"
 		return 1
 	fi
 
 	for package in "$@"; do
 		if ! command -v "$package" &>/dev/null; then
-			_yellow "正在安装 $package"
+			printf "${yellow}正在安装${package}${white}\n"
 			if command -v dnf &>/dev/null; then
 				dnf install -y "$package"
 			elif command -v yum &>/dev/null; then
