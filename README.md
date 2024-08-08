@@ -5,14 +5,16 @@ docker & docker-compose一键部署最新版，根据IP归属指定对应配置�
 
 - 直接运行(不建议大陆服务器使用这种方式)
 ```shell
-bash <(wget -qO- https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh)
+#
 ```
 ```shell
-curl -fsSL https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh | bash -
+curl -fsSL https://github.com/honeok8s/get-docker/releases/download/v0.1/get-docker.sh.x -o get-docker.sh && chmod +x get-docker.sh && ./get-docker.sh
+#bash <(wget -qO- https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh)
+#curl -fsSL https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh | bash -
 ```
-- 下载本地运行
+- 下载本地运行(不可用)
 ```shell
-curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh && chmod +x ./get-docker.sh
+#curl -fsSL -O https://raw.githubusercontent.com/honeok8s/get-docker/main/get-docker.sh && chmod +x ./get-docker.sh
 
 # 默认安装 Docker
 ./get-docker.sh
